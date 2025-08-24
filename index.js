@@ -7,15 +7,18 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds, 
         GatewayIntentBits.GuildMessages, 
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers
     ]
 });
 
 client.commands = new Collection();
+client.cooldowns = new Collection();
 
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
+//retrieve commands in folder
 for (const folder of commandFolders){
     const commandsPath = path.join(foldersPath, folder);
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
@@ -31,6 +34,22 @@ for (const folder of commandFolders){
         }
     }
 }
+
+//retrieve event folder
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('js'));
+
+for (const file of eventFiles){
+    const filePath = path.join(eventsPath, file);
+    const event = require(filePath);
+
+    if(event.once){
+        client.once(event.name, (...args) => event.execute(...args));
+    } else{
+        client.on(event.name, (...args) => event.execute(...args));
+    }
+}
+
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
@@ -61,13 +80,6 @@ client.once('clientReady', () => {
     console.log(`Bot loggato come ${client.user.tag}`);
 });
 
-
-// client.on('messageCreate', (message) => {
-//     if (message.author.bot) return;
-//     if (message.content === '!ciao') {
-//         //se non è = ciao non va da gestire + Ciao @username
-//         message.reply('Ciao');
-//     }
-// });
-
 client.login(process.env.DISCORD_TOKEN);
+
+//TODO create folder for different comands (moderations ec)
