@@ -29,7 +29,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
 (async () => {
     try {
-        console.log(`loding ${commands.length} commands`);
+        console.log(`loading ${commands.length} commands`);
 
         const data = await rest.put(
             Routes.applicationGuildCommands(clientId, guildId), // Guild-specific = immediato
