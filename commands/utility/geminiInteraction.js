@@ -41,7 +41,9 @@ module.exports = {
                     start = end;
                 }
             } else {
-                await interaction.editReply(replyText);
+                
+                await interaction.editReply("prompt: " + text + "\n" + replyText);
+                
             }
 
         } catch (error) {
